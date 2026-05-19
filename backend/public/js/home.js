@@ -1,28 +1,5 @@
 import { projectsApi, teamApi, isLoggedIn, isAdmin, getUser } from './api.js';
 
-// Navbar scroll effect
-window.addEventListener('scroll', () => {
-  const nav = document.getElementById('navbar');
-  nav?.classList.toggle('scrolled', window.scrollY > 60);
-});
-
-// Mobile menu
-document.getElementById('menu-toggle')?.addEventListener('click', () => {
-  document.getElementById('nav-menu')?.classList.toggle('open');
-});
-
-// Nav auth state
-function initNav() {
-  const loginBtn = document.getElementById('nav-login');
-  const painelBtn = document.getElementById('nav-painel');
-  const verificarBtn = document.getElementById('btn-verificar-orcamento');
-  if (isLoggedIn()) {
-    if (loginBtn) loginBtn.style.display = 'none';
-    if (painelBtn) { painelBtn.style.display = 'block'; painelBtn.textContent = isAdmin() ? 'Painel Admin' : 'Meu Painel'; }
-    if (verificarBtn) verificarBtn.style.display = 'none';
-  }
-}
-
 // Load featured projects
 async function loadProjects() {
   const grid = document.getElementById('projects-grid');

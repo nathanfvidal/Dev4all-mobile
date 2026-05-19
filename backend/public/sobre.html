@@ -127,11 +127,6 @@
           <h3>Murilo Lacerda</h3>
           <p class="text-muted">Dev Front-end & QA</p>
         </div>
-        <div class="team-card">
-          <div class="team-avatar" style="background:#ef4444">MS</div>
-          <h3>Marcos Segundo</h3>
-          <p class="text-muted">Estagiário de Suporte</p>
-        </div>
       </div>
     </div>
   </section>
@@ -191,23 +186,8 @@
     </div>
   </footer>
 
+  <script src="/js/nav.js"></script>
   <script type="module" src="/js/sobre.js"></script>
-  <script>
-    window.addEventListener('scroll', () => {
-      document.getElementById('navbar')?.classList.toggle('scrolled', window.scrollY > 60);
-    });
-    document.getElementById('menu-toggle')?.addEventListener('click', () => {
-      document.getElementById('nav-menu')?.classList.toggle('open');
-    });
-    try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        document.getElementById('nav-login').style.display = 'none';
-        document.getElementById('nav-painel').style.display = 'block';
-        document.getElementById('btn-verificar-orcamento').style.display = 'none';
-      }
-    } catch {}
-  </script>
   <script src="/js/verificar-modal.js"></script>
 </body>
 </html>

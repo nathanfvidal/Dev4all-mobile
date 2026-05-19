@@ -17,7 +17,7 @@ const teamData = [
     ordem: 1,
   },
   {
-    nome: 'Rauel Vinicius',
+    nome: 'Reuel Vinicius',
     cargo: 'Dev Back-end & DBA',
     bio: 'Especialista em bancos de dados relacionais e não-relacionais, APIs RESTful e performance.',
     linkedinUrl: '#',

@@ -1,0 +1,2 @@
+# Ignora backend/public nas estatísticas de linguagem do GitHub
+backend/public/** linguist-vendored

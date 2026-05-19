@@ -11,13 +11,12 @@ async function loadTeam() {
     { nome: 'Reuel Vinicius', cargo: 'Dev Back-end & DBA', initials: 'RV', color: '#10b981' },
     { nome: 'Nathan Feitoza', cargo: 'Dev Full Stack & UX Designer', initials: 'NF', color: '#8b5cf6' },
     { nome: 'Murilo Lacerda', cargo: 'Dev Front-end & QA', initials: 'ML', color: '#f59e0b' },
-    { nome: 'Marcos Segundo', cargo: 'Estagiário de Suporte', initials: 'MS', color: '#ef4444' },
   ];
 
   try {
     const res = await teamApi.list();
     const members = res.data?.length ? res.data : null;
-    const order = ['Felipe Almeida Albino', 'Rauel Vinicius', 'Nathan Feitoza', 'Murilo Lacerda', 'Marcos Segundo'];
+    const order = ['Felipe Almeida Albino', 'Reuel Vinicius', 'Nathan Feitoza', 'Murilo Lacerda'];
     const sorted = members
       ? [...members].sort((a, b) => {
           const ia = order.indexOf(a.nome), ib = order.indexOf(b.nome);

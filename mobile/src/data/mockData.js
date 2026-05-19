@@ -18,7 +18,6 @@ export const teamMembers = [
   { id: '2', initials: 'RV', nome: 'Reuel Vinicius',        cargo: 'Dev Back-end & DBA',             cor: '#10b981' },
   { id: '3', initials: 'NF', nome: 'Nathan Feitoza',        cargo: 'Dev Full Stack & UX Designer',   cor: '#8b5cf6' },
   { id: '4', initials: 'ML', nome: 'Murilo Lacerda',        cargo: 'Dev Front-end & QA',             cor: '#f59e0b' },
-  { id: '5', initials: 'MS', nome: 'Marcos Segundo',        cargo: 'Estagiário de Suporte',          cor: '#ef4444' },
 ];
 
 export const services = [

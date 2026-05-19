@@ -12,7 +12,6 @@ Aplicativo mobile da agência de desenvolvimento **Dev4All**, desenvolvido em **
 | Reuel Vinicius | Dev Back-end & DBA |
 | Nathan Feitoza | Dev Full Stack & UX Designer |
 | Murilo Lacerda | Dev Front-end & QA |
-| Marcos Segundo | Estagiário de Suporte |
 
 ---
 
