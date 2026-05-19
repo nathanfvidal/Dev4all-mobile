@@ -13,13 +13,16 @@ export default function LoginScreen({ navigation }) {
   const [erro, setErro] = useState('');
 
   function handleLogin() {
-    if (!email.includes('@') || senha.length < 3) {
-      setErro('E-mail ou senha inválidos.');
+    if (!email.trim() || !email.includes('@')) {
+      setErro('Digite um e-mail válido.');
+      return;
+    }
+    if (senha.length < 3) {
+      setErro('Senha muito curta.');
       return;
     }
     setErro('');
-    // Mock: navega para home
-    navigation.navigate('Home');
+    navigation.getParent()?.navigate('Home');
   }
 
   return (

@@ -1,10 +1,25 @@
 (function () {
+  // Estilos responsivos do modal
+  var style = document.createElement('style');
+  style.textContent = [
+    '#verificar-overlay .vrf-inner{max-width:460px;width:100%;background:#fff;border-radius:20px;padding:2rem;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.3)}',
+    '#verificar-overlay .vrf-row{display:flex;gap:.75rem;margin-bottom:1.25rem}',
+    '#verificar-overlay .vrf-row input{flex:1;min-width:0;padding:.75rem 1rem;border:1.5px solid #e5e7eb;border-radius:10px;font-size:1.1rem;font-weight:700;letter-spacing:.15em;text-align:center;outline:none}',
+    '#verificar-overlay .vrf-row button{flex-shrink:0;background:#2563eb;color:#fff;border:none;border-radius:10px;padding:.75rem 1.25rem;font-weight:700;cursor:pointer;font-size:.9rem;white-space:nowrap}',
+    '@media(max-width:480px){',
+    '  #verificar-overlay .vrf-inner{padding:1.25rem}',
+    '  #verificar-overlay .vrf-row{flex-direction:column}',
+    '  #verificar-overlay .vrf-row button{width:100%;padding:.85rem}',
+    '}',
+  ].join('');
+  document.head.appendChild(style);
+
   // Injeta o modal no body
   var overlay = document.createElement('div');
   overlay.id = 'verificar-overlay';
   overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9998;align-items:center;justify-content:center;padding:1rem';
   overlay.innerHTML = [
-    '<div style="background:#fff;border-radius:20px;padding:2rem;max-width:460px;width:100%;position:relative;box-shadow:0 24px 64px rgba(0,0,0,0.3)">',
+    '<div class="vrf-inner">',
       '<button onclick="fecharVerificar()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#9ca3af;padding:.25rem .5rem;border-radius:6px;line-height:1">&times;</button>',
       '<div style="text-align:center;margin-bottom:1.5rem">',
         '<div style="width:52px;height:52px;border-radius:50%;background:#eff6ff;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem">',
@@ -13,9 +28,9 @@
         '<h2 style="font-size:1.3rem;font-weight:800;color:#111827;margin:0 0 .35rem">Verificar Orçamento</h2>',
         '<p style="font-size:.875rem;color:#6b7280;margin:0">Digite o código de 6 dígitos recebido ao enviar o formulário</p>',
       '</div>',
-      '<div style="display:flex;gap:.75rem;margin-bottom:1.25rem">',
-        '<input id="vrf-codigo" type="text" maxlength="6" placeholder="Ex: 483921" inputmode="numeric" style="flex:1;padding:.75rem 1rem;border:1.5px solid #e5e7eb;border-radius:10px;font-size:1.1rem;font-weight:700;letter-spacing:.15em;text-align:center;outline:none">',
-        '<button id="vrf-btn" onclick="buscarOrcamento()" style="background:#2563eb;color:#fff;border:none;border-radius:10px;padding:.75rem 1.25rem;font-weight:700;cursor:pointer;font-size:.9rem;white-space:nowrap">Buscar</button>',
+      '<div class="vrf-row">',
+        '<input id="vrf-codigo" type="text" maxlength="6" placeholder="Ex: 483921" inputmode="numeric">',
+        '<button id="vrf-btn" onclick="buscarOrcamento()">Buscar</button>',
       '</div>',
       '<div id="vrf-resultado" style="display:none"></div>',
     '</div>'

@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withRepeat,
+  withSequence,
+  FadeInDown,
+  FadeIn,
+} from 'react-native-reanimated';
 import { COLORS, services, steps, testimonials, projects, brands } from '../data/mockData';
 
 const C = COLORS;
@@ -9,43 +18,84 @@ const C = COLORS;
 export default function HomeScreen({ navigation }) {
   const destaques = projects.filter((p) => p.destaque).slice(0, 3);
 
+  // ── Brands auto-scroll ──────────────────────────────────
+  const brandsRef = useRef(null);
+  const brandOffset = useRef(0);
+
+  // ── Hero glow pulse ─────────────────────────────────────
+  const glow1 = useSharedValue(0.12);
+  const glow2 = useSharedValue(0.08);
+
+  useEffect(() => {
+    glow1.value = withRepeat(
+      withSequence(
+        withTiming(0.38, { duration: 2800 }),
+        withTiming(0.12, { duration: 2800 }),
+      ), -1, false
+    );
+    glow2.value = withRepeat(
+      withSequence(
+        withTiming(0.07, { duration: 3400 }),
+        withTiming(0.28, { duration: 3400 }),
+      ), -1, false
+    );
+
+    const ITEM_W = 114; // brandText fontSize+gap approximation
+    const total = brands.length * ITEM_W;
+    const id = setInterval(() => {
+      brandOffset.current += 0.55;
+      if (brandOffset.current >= total) brandOffset.current = 0;
+      brandsRef.current?.scrollTo({ x: brandOffset.current, animated: false });
+    }, 16);
+    return () => clearInterval(id);
+  }, []);
+
+  const glow1Style = useAnimatedStyle(() => ({ opacity: glow1.value }));
+  const glow2Style = useAnimatedStyle(() => ({ opacity: glow2.value }));
+
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
 
         {/* ── HERO ─────────────────────────────────────────── */}
         <View style={s.hero}>
-          <Text style={s.heroLabel}>Dev Web & Mobile de Alta Performance</Text>
-          <Text style={s.heroTitle}>Transforme sua{'\n'}ideia em realidade{'\n'}digital</Text>
-          <Text style={s.heroSubtitle}>
-            Automatize seu negócio com tecnologia de ponta.{'\n'}
-            Criamos sites, sistemas e apps com facilidade,{'\n'}
-            acessibilidade e máxima performance.
-          </Text>
-          <View style={s.heroActions}>
-            <TouchableOpacity style={s.btnPrimary} onPress={() => navigation.navigate('Contato')}>
-              <Text style={s.btnPrimaryText}>Solicite seu projeto →</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={s.btnOutline} onPress={() => navigation.navigate('Portfólio')}>
-              <Text style={s.btnOutlineText}>Ver portfólio</Text>
-            </TouchableOpacity>
-          </View>
+          {/* Glow circles */}
+          <Animated.View style={[s.glowCircle1, glow1Style]} />
+          <Animated.View style={[s.glowCircle2, glow2Style]} />
 
-          {/* Stats bar */}
-          <View style={s.statsRow}>
-            {[['50+', 'Projetos'], ['98%', 'Satisfação'], ['24/7', 'Suporte']].map(([v, l], i) => (
-              <React.Fragment key={l}>
-                {i > 0 && <View style={s.statDiv} />}
-                <View style={s.statItem}>
-                  <Text style={s.statVal}>{v}</Text>
-                  <Text style={s.statLabel}>{l}</Text>
-                </View>
-              </React.Fragment>
-            ))}
-          </View>
+          <Animated.View entering={FadeInDown.duration(550).delay(80)}>
+            <Text style={s.heroLabel}>Dev Web & Mobile de Alta Performance</Text>
+            <Text style={s.heroTitle}>Transforme sua{'\n'}ideia em realidade{'\n'}digital</Text>
+            <Text style={s.heroSubtitle}>
+              Automatize seu negócio com tecnologia de ponta.{'\n'}
+              Criamos sites, sistemas e apps com facilidade,{'\n'}
+              acessibilidade e máxima performance.
+            </Text>
+            <View style={s.heroActions}>
+              <TouchableOpacity style={s.btnPrimary} onPress={() => navigation.navigate('Contato')}>
+                <Text style={s.btnPrimaryText}>Solicite seu projeto →</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={s.btnOutline} onPress={() => navigation.navigate('Portfólio')}>
+                <Text style={s.btnOutlineText}>Ver portfólio</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Stats bar */}
+            <View style={s.statsRow}>
+              {[['50+', 'Projetos'], ['98%', 'Satisfação'], ['24/7', 'Suporte']].map(([v, l], i) => (
+                <React.Fragment key={l}>
+                  {i > 0 && <View style={s.statDiv} />}
+                  <View style={s.statItem}>
+                    <Text style={s.statVal}>{v}</Text>
+                    <Text style={s.statLabel}>{l}</Text>
+                  </View>
+                </React.Fragment>
+              ))}
+            </View>
+          </Animated.View>
 
           {/* Dashboard card */}
-          <View style={s.dashCard}>
+          <Animated.View entering={FadeInDown.duration(600).delay(320)} style={s.dashCard}>
             <View style={s.macBar}>
               <View style={[s.macDot, { backgroundColor: '#ef4444' }]} />
               <View style={[s.macDot, { backgroundColor: '#f59e0b' }]} />
@@ -70,20 +120,26 @@ export default function HomeScreen({ navigation }) {
                 ))}
               </View>
             </View>
-          </View>
+          </Animated.View>
         </View>
 
         {/* ── BRANDS ───────────────────────────────────────── */}
         <View style={s.brandsStrip}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.brandsContent}>
-            {[...brands, ...brands].map((b, i) => (
+          <ScrollView
+            ref={brandsRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            scrollEnabled={false}
+            contentContainerStyle={s.brandsContent}
+          >
+            {[...brands, ...brands, ...brands].map((b, i) => (
               <Text key={i} style={s.brandText}>{b}</Text>
             ))}
           </ScrollView>
         </View>
 
         {/* ── SERVICES ─────────────────────────────────────── */}
-        <View style={s.section}>
+        <Animated.View entering={FadeIn.duration(500).delay(100)} style={s.section}>
           <Text style={s.sectionLabel}>NOSSOS SERVIÇOS</Text>
           <Text style={s.sectionTitle}>Tudo que você precisa{'\n'}num só lugar</Text>
           <Text style={s.sectionSubtitle}>Soluções digitais completas para transformar seu negócio</Text>
@@ -101,7 +157,7 @@ export default function HomeScreen({ navigation }) {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </Animated.View>
 
         {/* ── HOW IT WORKS ─────────────────────────────────── */}
         <View style={[s.section, { backgroundColor: C.bgLight }]}>
@@ -205,7 +261,9 @@ const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.navyDark },
 
   /* HERO */
-  hero: { backgroundColor: C.navyDark, padding: 24, paddingTop: 20, paddingBottom: 32 },
+  hero: { backgroundColor: C.navyDark, padding: 24, paddingTop: 20, paddingBottom: 32, overflow: 'hidden' },
+  glowCircle1: { position: 'absolute', width: 320, height: 320, borderRadius: 160, backgroundColor: '#2563eb', top: -120, right: -80 },
+  glowCircle2: { position: 'absolute', width: 240, height: 240, borderRadius: 120, backgroundColor: '#8b5cf6', bottom: -60, left: -60 },
   heroLabel: { color: C.blue, fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 },
   heroTitle: { color: '#fff', fontSize: 34, fontWeight: '800', lineHeight: 42, marginBottom: 14 },
   heroSubtitle: { color: C.textMuted, fontSize: 14, lineHeight: 22, marginBottom: 24 },

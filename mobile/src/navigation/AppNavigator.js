@@ -19,7 +19,7 @@ const MUTED = '#9ca3af';
 
 function PortfolioStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
       <Stack.Screen name="PortfolioList"  component={PortfolioScreen} />
       <Stack.Screen name="ProjectDetail"  component={ProjectDetailScreen} />
     </Stack.Navigator>
@@ -28,7 +28,7 @@ function PortfolioStack() {
 
 function AuthStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_bottom' }}>
       <Stack.Screen name="Login"    component={LoginScreen} />
       <Stack.Screen name="Registro" component={RegistroScreen} />
     </Stack.Navigator>
@@ -41,6 +41,7 @@ export default function AppNavigator() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: BLUE,
+        tabBarHideOnKeyboard: true,
         tabBarInactiveTintColor: MUTED,
         tabBarStyle: {
           backgroundColor: '#fff',

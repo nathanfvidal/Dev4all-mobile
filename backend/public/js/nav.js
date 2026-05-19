@@ -74,6 +74,9 @@
       return path === href;
     }
 
+    var hasToken = false;
+    try { hasToken = !!localStorage.getItem('token'); } catch (e) {}
+
     var items = [
       {
         href: '/',
@@ -100,7 +103,8 @@
     var bnav = document.createElement('nav');
     bnav.className = 'bottom-nav';
     bnav.setAttribute('aria-label', 'Navegação');
-    bnav.innerHTML = items.map(function (item) {
+
+    var navLinks = items.map(function (item) {
       return (
         '<a href="' + item.href + '" class="bottom-nav-item' + (isActive(item.href) ? ' active' : '') + '">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -110,7 +114,30 @@
         '</a>'
       );
     }).join('');
+
+    // Verificar Orçamento (hidden when logged in)
+    var verificarBtn = !hasToken
+      ? '<button class="bottom-nav-item" id="bnav-verificar">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>' +
+        '</svg>' +
+        '<span>Verificar</span>' +
+        '</button>'
+      : '';
+
+    bnav.innerHTML = navLinks + verificarBtn;
     document.body.appendChild(bnav);
+
+    // Wire up Verificar button to open the modal
+    var bnavVerificar = document.getElementById('bnav-verificar');
+    if (bnavVerificar) {
+      bnavVerificar.addEventListener('click', function () {
+        var modalBtn = document.getElementById('btn-verificar-orcamento');
+        if (modalBtn) {
+          modalBtn.click();
+        }
+      });
+    }
   }
 
   if (document.readyState === 'loading') {
