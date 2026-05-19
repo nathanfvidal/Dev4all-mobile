@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Conta — Dev4all</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="auth-body">
+  <a href="/" class="auth-logo"><span>Dev4all</span></a>
+  <div class="auth-circle auth-circle-1"></div>
+  <div class="auth-circle auth-circle-2"></div>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <h1>Crie sua conta</h1>
+      <p class="auth-subtitle">Comece a usar a Dev4all hoje</p>
+
+      <div class="tab-switcher">
+        <a href="/login.html" class="tab-btn">Login</a>
+        <a href="/registro.html" class="tab-btn active">Registrar-se</a>
+      </div>
+
+      <form id="form-registro">
+        <div class="form-group">
+          <label for="reg-nome">Nome Completo</label>
+          <input type="text" id="reg-nome" placeholder="Digite seu nome completo" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="reg-email">E-mail</label>
+          <input type="email" id="reg-email" placeholder="seu@email.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="reg-senha">Senha</label>
+          <input type="password" id="reg-senha" placeholder="Mínimo 8 caracteres" required autocomplete="new-password">
+          <div class="pwd-strength-bar"><div id="pwd-bar"></div></div>
+          <ul class="pwd-checklist" id="pwd-checklist">
+            <li id="chk-len"><i class="fa-solid fa-circle-xmark"></i> Mínimo 8 caracteres</li>
+            <li id="chk-upper"><i class="fa-solid fa-circle-xmark"></i> Uma letra maiúscula</li>
+            <li id="chk-number"><i class="fa-solid fa-circle-xmark"></i> Um número</li>
+          </ul>
+        </div>
+        <div class="form-group">
+          <label for="reg-confirmar">Confirmar Senha</label>
+          <input type="password" id="reg-confirmar" placeholder="Repita sua senha" required autocomplete="new-password">
+          <p id="pwd-match-msg" class="pwd-match-msg" style="display:none"></p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Criar conta →</button>
+        <p class="auth-footer-link">
+          Já tem conta? <a href="/login.html" class="form-link">Entrar</a>
+        </p>
+      </form>
+    </div>
+    <p class="auth-copyright">© 2026 Dev4all. Todos os direitos reservados.</p>
+  </div>
+
+  <script type="module" src="/js/registro.js"></script>
+</body>
+</html>

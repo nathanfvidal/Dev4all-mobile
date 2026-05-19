@@ -1,0 +1,27 @@
+# Node
+node_modules/
+.env
+
+# Expo
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# AI / Claude Code
+.claude/
+CLAUDE.md
+AGENTS.md
+*.claude

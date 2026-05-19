@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dev4all — Desenvolvimento Web & Mobile de Alta Performance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav id="navbar" class="navbar">
+    <div class="container navbar-inner">
+      <a href="/" class="nav-logo">
+        <span>Dev4all</span>
+      </a>
+      <button id="menu-toggle" class="menu-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul id="nav-menu" class="nav-menu">
+        <li><a href="/" class="nav-link active">Home</a></li>
+        <li><a href="/portfolio.html" class="nav-link">Portfólio</a></li>
+        <li><a href="/sobre.html" class="nav-link">Sobre nós</a></li>
+        <li><a href="/contato.html" class="nav-link">Contato</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button id="btn-verificar-orcamento" class="btn btn-outline-dark" style="font-size:.85rem">Verificar Orçamento</button>
+        <a id="nav-painel" href="/painel.html" class="btn btn-primary" style="display:none">Meu Painel</a>
+        <a id="nav-login" href="/login.html" class="btn btn-primary">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <p class="hero-label">Dev Web & Mobile de Alta Performance</p>
+        <h1>Transforme sua<br>ideia em realidade<br>digital</h1>
+        <p class="hero-subtitle">Automatize seu negócio com tecnologia de ponta.<br>Criamos sites, sistemas e apps com facilidade,<br>acessibilidade e máxima performance.</p>
+        <div class="hero-actions">
+          <a href="/contato.html" class="btn btn-primary btn-lg">Solicite seu projeto →</a>
+          <a href="/portfolio.html" class="btn btn-outline btn-lg">Ver portfólio</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><strong>50+</strong><span>Projetos</span></div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat"><strong>98%</strong><span>Satisfação</span></div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat"><strong>24/7</strong><span>Suporte</span></div>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-mac">
+          <span class="mac-dot red"></span>
+          <span class="mac-dot yellow"></span>
+          <span class="mac-dot green"></span>
+        </div>
+        <div class="hero-card-inner">
+          <div class="hero-card-stats">
+            <div class="hcs-item">
+              <span class="hcs-num">47</span>
+              <span class="hcs-label">Projetos</span>
+            </div>
+            <div class="hcs-item">
+              <span class="hcs-num">98%</span>
+              <span class="hcs-label">Satisfação</span>
+            </div>
+            <div class="hcs-item">
+              <span class="hcs-num">99.9%</span>
+              <span class="hcs-label">Uptime</span>
+            </div>
+          </div>
+          <p class="hcs-caption">Crescimento de projetos por mês</p>
+          <div class="bar-chart">
+            <div class="bar" style="height:40%"></div>
+            <div class="bar" style="height:55%"></div>
+            <div class="bar" style="height:45%"></div>
+            <div class="bar" style="height:70%"></div>
+            <div class="bar" style="height:60%"></div>
+            <div class="bar active" style="height:100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRANDS STRIP -->
+  <div class="brands-strip">
+<div class="brands-track">
+      <span>StartupX</span><span>MercadoBR</span><span>TechFlow</span>
+      <span>BuildCo</span><span>NovaPay</span><span>AgileHub</span>
+      <span>StartupX</span><span>MercadoBR</span><span>TechFlow</span>
+      <span>BuildCo</span><span>NovaPay</span><span>AgileHub</span>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section class="section services-section" id="servicos">
+    <div class="container">
+      <div class="section-label">NOSSOS SERVIÇOS</div>
+      <h2 class="section-title">Tudo que você precisa<br>num só lugar</h2>
+      <p class="section-subtitle">Soluções digitais completas para transformar seu negócio</p>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon" style="background:#dbeafe;color:#2563eb"><i class="fa-solid fa-globe"></i></div>
+          <h3>Sites Profissionais</h3>
+          <p>Sites modernos, responsivos e otimizados para SEO que convertem visitantes em clientes.</p>
+          <a href="/contato.html" class="service-arrow"><i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="service-card">
+          <div class="service-icon" style="background:#d1fae5;color:#10b981"><i class="fa-solid fa-mobile-screen"></i></div>
+          <h3>Apps Mobile</h3>
+          <p>Aplicativos iOS e Android de alta performance com UI/UX impecável e entrega ágil.</p>
+          <a href="/contato.html" class="service-arrow"><i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="service-card">
+          <div class="service-icon" style="background:#ede9fe;color:#8b5cf6"><i class="fa-solid fa-gear"></i></div>
+          <h3>Sistemas Web</h3>
+          <p>Plataformas e sistemas customizados com painel admin, automações e integrações.</p>
+          <a href="/contato.html" class="service-arrow"><i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="service-card">
+          <div class="service-icon" style="background:#ffedd5;color:#f59e0b"><i class="fa-solid fa-rocket"></i></div>
+          <h3>Performance & SEO</h3>
+          <p>Otimização técnica para velocidade máxima, melhor ranqueamento e mais conversões.</p>
+          <a href="/contato.html" class="service-arrow"><i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section how-section" id="como-funciona">
+    <div class="container">
+      <div class="section-label">COMO FUNCIONA</div>
+      <h2 class="section-title">Do briefing ao lançamento<br>em 4 etapas simples</h2>
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-number">01</div>
+          <h3>Briefing</h3>
+          <p>Entendemos seu projeto, metas e público alvo em uma reunião rápida.</p>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+          <div class="step-number">02</div>
+          <h3>Design & Prototipagem</h3>
+          <p>Criamos o visual no Figma e apresentamos para sua aprovação.</p>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+          <div class="step-number">03</div>
+          <h3>Desenvolvimento</h3>
+          <p>Programamos com as melhores tecnologias: React, Next.js, Node.</p>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+          <div class="step-number">04</div>
+          <h3>Entrega & Suporte</h3>
+          <p>Lançamos o projeto e oferecemos suporte contínuo 24/7.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PORTFOLIO PREVIEW -->
+  <section class="section portfolio-section" id="portfolio">
+    <div class="container">
+      <div class="section-label">NOSSO PORTFÓLIO</div>
+      <h2 class="section-title">Projetos que entregam<br>resultados reais</h2>
+      <div id="projects-grid" class="projects-grid">
+        <!-- Carregado via JS -->
+        <div class="skeleton" style="height:280px;border-radius:16px"></div>
+        <div class="skeleton" style="height:280px;border-radius:16px"></div>
+        <div class="skeleton" style="height:280px;border-radius:16px"></div>
+      </div>
+      <div style="text-align:center;margin-top:2.5rem">
+        <a href="/portfolio.html" class="btn btn-outline-dark btn-lg">Ver mais projetos →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section testimonials-section">
+    <div class="container">
+      <div class="section-label">DEPOIMENTOS</div>
+      <h2 class="section-title">O que nossos clientes dizem</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <p>"A Dev4all transformou nosso negócio! O site ficou incrível e as vendas aumentaram 3x em 60 dias."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:#2563eb">CA</div>
+            <div>
+              <strong>Carlos Silva</strong>
+              <span>CEO MercadoBR</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <p>"Equipe super profissional, prazo cumprido e suporte excelente. Recomendo 100% para qualquer empresa."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:#10b981">AN</div>
+            <div>
+              <strong>Ana Beatriz</strong>
+              <span>Fundadora StartupX</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <p>"O app mobile superou todas as expectativas. Interface linda, rápido e sem bugs. Melhor investimento!"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:#8b5cf6">RO</div>
+            <div>
+              <strong>Roberto Lima</strong>
+              <span>CTO TechFlow</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="cta-section">
+    <div class="container cta-inner">
+      <h2>Pronto para transformar<br>seu negócio digital?</h2>
+      <p>Fale com nossa equipe hoje e receba um orçamento gratuito em menos de 24 horas.</p>
+      <div class="cta-actions">
+        <a href="/contato.html" class="btn btn-primary btn-lg">Solicite seu projeto grátis</a>
+        <a href="https://wa.me/5511999999999" class="btn btn-lg" style="background:#22c55e;color:white;border-color:#22c55e" target="_blank">Falar no WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a href="/" class="nav-logo footer-logo">
+          <span>Dev4all</span>
+        </a>
+        <p>Criamos experiências digitais<br>que transformam negócios.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-btn" style="background:#2563eb"></a>
+          <a href="#" class="social-btn" style="background:#22c55e"></a>
+          <a href="#" class="social-btn" style="background:#8b5cf6"></a>
+          <a href="#" class="social-btn" style="background:#ef4444"></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Serviços</h4>
+        <ul>
+          <li><a href="/contato.html">Sites Profissionais</a></li>
+          <li><a href="/contato.html">Apps Mobile</a></li>
+          <li><a href="/contato.html">Sistemas Web</a></li>
+          <li><a href="/contato.html">Consultoria</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Empresa</h4>
+        <ul>
+          <li><a href="/sobre.html">Sobre nós</a></li>
+          <li><a href="/portfolio.html">Portfólio</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Carreiras</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Suporte</h4>
+        <ul>
+          <li><a href="#">Central de ajuda</a></li>
+          <li><a href="#">WhatsApp</a></li>
+          <li><a href="#">E-mail</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacidade</a></li>
+          <li><a href="#">Termos de uso</a></li>
+          <li><a href="#">Cookies</a></li>
+          <li><a href="#">LGPD</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Dev4all. Todos os direitos reservados. Feito com cuidado pela equipe Dev4all</p>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/home.js"></script>
+  <script src="/js/verificar-modal.js"></script>
+</body>
+</html>
