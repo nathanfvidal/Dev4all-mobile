@@ -10,6 +10,8 @@ import SobreScreen         from '../screens/SobreScreen';
 import ContactScreen       from '../screens/ContactScreen';
 import LoginScreen         from '../screens/LoginScreen';
 import RegistroScreen      from '../screens/RegistroScreen';
+import ProfileScreen       from '../screens/ProfileScreen';
+import { useAuth }         from '../context/AuthContext';
 
 const Tab   = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -35,6 +37,11 @@ function AuthStack() {
   );
 }
 
+function ContaTab() {
+  const { isLoggedIn } = useAuth();
+  return isLoggedIn ? <ProfileScreen /> : <AuthStack />;
+}
+
 export default function AppNavigator() {
   return (
     <Tab.Navigator
@@ -58,7 +65,7 @@ export default function AppNavigator() {
             'Portfólio': 'briefcase',
             'Sobre nós': 'users',
             Contato:   'mail',
-            Login:     'user',
+            Conta:     'user',
           };
           return <Feather name={icons[route.name] || 'circle'} size={size} color={color} />;
         },
@@ -68,7 +75,7 @@ export default function AppNavigator() {
       <Tab.Screen name="Portfólio"  component={PortfolioStack} />
       <Tab.Screen name="Sobre nós"  component={SobreScreen} />
       <Tab.Screen name="Contato"    component={ContactScreen} />
-      <Tab.Screen name="Login"      component={AuthStack} />
+      <Tab.Screen name="Conta"      component={ContaTab} />
     </Tab.Navigator>
   );
 }

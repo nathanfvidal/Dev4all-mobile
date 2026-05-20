@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../context/AuthContext';
 import { COLORS } from '../data/mockData';
 
 const C = COLORS;
@@ -11,6 +12,7 @@ export default function LoginScreen({ navigation }) {
   const [senha, setSenha] = useState('');
   const [showSenha, setShowSenha] = useState(false);
   const [erro, setErro] = useState('');
+  const { login } = useAuth();
 
   function handleLogin() {
     if (!email.trim() || !email.includes('@')) {
@@ -22,7 +24,9 @@ export default function LoginScreen({ navigation }) {
       return;
     }
     setErro('');
-    navigation.getParent()?.navigate('Home');
+    const nome = email.includes('admin') ? 'Nathan Feitoza (Admin)' : email.split('@')[0];
+    const role = email.includes('admin') ? 'admin' : 'cliente';
+    login({ nome, email, role });
   }
 
   return (
