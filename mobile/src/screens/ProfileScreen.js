@@ -24,7 +24,7 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
 
         <Animated.View entering={FadeInDown.duration(450)} style={s.header}>
           <View style={s.avatar}>
@@ -72,7 +72,7 @@ export default function ProfileScreen({ navigation }) {
 }
 
 const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.bgLight },
+  safe: { flex: 1, backgroundColor: C.navyDark },
 
   header: {
     backgroundColor: C.navyDark,

@@ -74,7 +74,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
 }
 
 const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.white },
+  safe: { flex: 1, backgroundColor: '#000' },
   image: { width: '100%', height: 260 },
   backBtn: { position: 'absolute', top: 16, left: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: C.white, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 6, elevation: 4 },
   destaqueBadge: { position: 'absolute', top: 16, right: 16, backgroundColor: C.blue, flexDirection: 'row', alignItems: 'center', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5, gap: 5 },
