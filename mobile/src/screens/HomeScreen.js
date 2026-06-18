@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, {
@@ -11,12 +11,16 @@ import Animated, {
   FadeInDown,
   FadeIn,
 } from 'react-native-reanimated';
-import { COLORS, services, steps, testimonials, projects, brands } from '../data/mockData';
+import { COLORS, services, steps, testimonials, brands } from '../data/mockData';
+import { api } from '../services/api';
+import FeedbackModal from '../components/FeedbackModal';
 
 const C = COLORS;
 
 export default function HomeScreen({ navigation }) {
-  const destaques = projects.filter((p) => p.destaque).slice(0, 3);
+  const [destaques, setDestaques] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [modal, setModal] = useState({ visible: false, message: '' });
 
   // ── Brands auto-scroll ──────────────────────────────────
   const brandsRef = useRef(null);
@@ -25,6 +29,13 @@ export default function HomeScreen({ navigation }) {
   // ── Hero glow pulse ─────────────────────────────────────
   const glow1 = useSharedValue(0.12);
   const glow2 = useSharedValue(0.08);
+
+  useEffect(() => {
+    api.getProjects()
+      .then((res) => setDestaques(res.data.filter((p) => p.destaque).slice(0, 3)))
+      .catch((e) => setModal({ visible: true, message: e.message }))
+      .finally(() => setLoadingProjects(false));
+  }, []);
 
   useEffect(() => {
     glow1.value = withRepeat(
@@ -55,6 +66,13 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
+      <FeedbackModal
+        visible={modal.visible}
+        type="error"
+        title="Erro ao carregar projetos"
+        message={modal.message}
+        onClose={() => setModal({ visible: false, message: '' })}
+      />
       <ScrollView showsVerticalScrollIndicator={false}>
 
         {/* ── HERO ─────────────────────────────────────────── */}
@@ -181,27 +199,31 @@ export default function HomeScreen({ navigation }) {
         <View style={s.section}>
           <Text style={s.sectionLabel}>NOSSO PORTFÓLIO</Text>
           <Text style={s.sectionTitle}>Projetos que entregam{'\n'}resultados reais</Text>
-          {destaques.map((proj) => (
-            <TouchableOpacity
-              key={proj.id}
-              style={s.projCard}
-              onPress={() => navigation.navigate('Portfólio', { screen: 'ProjectDetail', params: { project: proj } })}
-              activeOpacity={0.85}
-            >
-              <Image source={{ uri: proj.imagemUrl }} style={s.projImg} />
-              <View style={s.projInfo}>
-                <View style={s.projCats}>
-                  {proj.categorias.map((c) => (
-                    <View key={c} style={s.catBadge}>
-                      <Text style={s.catText}>{c}</Text>
-                    </View>
-                  ))}
+          {loadingProjects ? (
+            <ActivityIndicator size="large" color={C.blue} style={{ marginVertical: 24 }} />
+          ) : (
+            destaques.map((proj) => (
+              <TouchableOpacity
+                key={proj._id}
+                style={s.projCard}
+                onPress={() => navigation.navigate('Portfólio', { screen: 'ProjectDetail', params: { project: { ...proj, id: proj._id } } })}
+                activeOpacity={0.85}
+              >
+                <Image source={{ uri: proj.imagemUrl }} style={s.projImg} />
+                <View style={s.projInfo}>
+                  <View style={s.projCats}>
+                    {proj.categorias.map((c) => (
+                      <View key={c} style={s.catBadge}>
+                        <Text style={s.catText}>{c}</Text>
+                      </View>
+                    ))}
+                  </View>
+                  <Text style={s.projTitle}>{proj.titulo}</Text>
+                  <Text style={s.projDesc} numberOfLines={2}>{proj.descricao}</Text>
                 </View>
-                <Text style={s.projTitle}>{proj.titulo}</Text>
-                <Text style={s.projDesc} numberOfLines={2}>{proj.descricao}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+            ))
+          )}
           <TouchableOpacity style={s.btnOutlineDark} onPress={() => navigation.navigate('Portfólio')}>
             <Text style={s.btnOutlineDarkText}>Ver mais projetos →</Text>
           </TouchableOpacity>
