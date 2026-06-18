@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 import { COLORS } from '../data/mockData';
+import FeedbackModal from '../components/FeedbackModal';
 
 const C = COLORS;
 
@@ -10,6 +13,9 @@ export default function RegistroScreen({ navigation }) {
   const [form, setForm] = useState({ nome: '', email: '', senha: '' });
   const [showSenha, setShowSenha] = useState(false);
   const [erros, setErros] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [modal, setModal] = useState({ visible: false, message: '' });
+  const { login } = useAuth();
 
   function validar() {
     const e = {};
@@ -19,18 +25,33 @@ export default function RegistroScreen({ navigation }) {
     return e;
   }
 
-  function handleRegistrar() {
+  async function handleRegistrar() {
     const e = validar();
     if (Object.keys(e).length > 0) { setErros(e); return; }
     setErros({});
-    navigation.navigate('Home');
+    setLoading(true);
+    try {
+      const res = await api.register(form.nome, form.email, form.senha);
+      login(res.data.user, res.data.token);
+    } catch (err) {
+      setModal({ visible: true, message: err.message });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <SafeAreaView style={s.safe}>
+      <FeedbackModal
+        visible={modal.visible}
+        type="error"
+        title="Erro ao criar conta"
+        message={modal.message}
+        onClose={() => setModal({ visible: false, message: '' })}
+      />
+
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
-
           <View style={s.circle1} />
           <View style={s.circle2} />
 
@@ -58,9 +79,9 @@ export default function RegistroScreen({ navigation }) {
                 placeholder="Seu nome completo"
                 placeholderTextColor={C.textMuted}
                 value={form.nome}
-                onChangeText={(v) => setForm({ ...form, nome: v })}
+                onChangeText={(v) => { setForm({ ...form, nome: v }); setErros((p) => ({ ...p, nome: '' })); }}
               />
-              {erros.nome && <Text style={s.erroText}>{erros.nome}</Text>}
+              {erros.nome ? <Text style={s.erroText}>{erros.nome}</Text> : null}
             </View>
 
             <View style={s.campo}>
@@ -72,9 +93,9 @@ export default function RegistroScreen({ navigation }) {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={form.email}
-                onChangeText={(v) => setForm({ ...form, email: v })}
+                onChangeText={(v) => { setForm({ ...form, email: v }); setErros((p) => ({ ...p, email: '' })); }}
               />
-              {erros.email && <Text style={s.erroText}>{erros.email}</Text>}
+              {erros.email ? <Text style={s.erroText}>{erros.email}</Text> : null}
             </View>
 
             <View style={s.campo}>
@@ -86,17 +107,17 @@ export default function RegistroScreen({ navigation }) {
                   placeholderTextColor={C.textMuted}
                   secureTextEntry={!showSenha}
                   value={form.senha}
-                  onChangeText={(v) => setForm({ ...form, senha: v })}
+                  onChangeText={(v) => { setForm({ ...form, senha: v }); setErros((p) => ({ ...p, senha: '' })); }}
                 />
                 <TouchableOpacity style={s.eyeBtn} onPress={() => setShowSenha((v) => !v)}>
                   <Feather name={showSenha ? 'eye-off' : 'eye'} size={18} color={C.textMuted} />
                 </TouchableOpacity>
               </View>
-              {erros.senha && <Text style={s.erroText}>{erros.senha}</Text>}
+              {erros.senha ? <Text style={s.erroText}>{erros.senha}</Text> : null}
             </View>
 
-            <TouchableOpacity style={s.btnPrimary} onPress={handleRegistrar}>
-              <Text style={s.btnPrimaryText}>Criar Conta →</Text>
+            <TouchableOpacity style={[s.btnPrimary, loading && s.btnDisabled]} onPress={handleRegistrar} disabled={loading}>
+              {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.btnPrimaryText}>Criar Conta →</Text>}
             </TouchableOpacity>
 
             <Text style={s.footerText}>
@@ -136,6 +157,7 @@ const s = StyleSheet.create({
   passwordRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   eyeBtn: { padding: 4 },
   btnPrimary: { backgroundColor: C.blue, borderRadius: 8, paddingVertical: 14, alignItems: 'center', marginTop: 4, marginBottom: 16 },
+  btnDisabled: { opacity: 0.6 },
   btnPrimaryText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   footerText: { fontSize: 13, color: C.textMuted, textAlign: 'center' },
   copyright: { color: C.textMuted, fontSize: 11, textAlign: 'center', marginTop: 20 },

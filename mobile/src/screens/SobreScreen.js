@@ -1,10 +1,13 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, teamMembers, values } from '../data/mockData';
+import { COLORS, values } from '../data/mockData';
+import { api } from '../services/api';
 
 const C = COLORS;
+
+const AVATAR_COLORS = ['#2563eb', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4'];
 
 const whyCards = [
   { titulo: 'Em ambientes profissionais', desc: 'Usuários podem monitorar em tempo real sua própria aplicação, melhorando a produtividade.' },
@@ -12,7 +15,26 @@ const whyCards = [
   { titulo: 'Para qualquer dispositivo',  desc: 'Soluções responsivas e otimizadas para funcionar perfeitamente em qualquer tela.' },
 ];
 
+function getInitials(nome) {
+  return nome
+    .split(' ')
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+
 export default function SobreScreen({ navigation }) {
+  const [team, setTeam] = useState([]);
+  const [loadingTeam, setLoadingTeam] = useState(true);
+
+  useEffect(() => {
+    api.getTeam()
+      .then((res) => setTeam(res.data))
+      .catch(() => setTeam([]))
+      .finally(() => setLoadingTeam(false));
+  }, []);
+
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -60,17 +82,21 @@ export default function SobreScreen({ navigation }) {
         <View style={s.section}>
           <Text style={s.sectionLabel}>A EQUIPE</Text>
           <Text style={s.sectionTitle}>Integrantes</Text>
-          <View style={s.teamGrid}>
-            {teamMembers.map((m) => (
-              <View key={m.id} style={s.teamCard}>
-                <View style={[s.teamAvatar, { backgroundColor: m.cor }]}>
-                  <Text style={s.teamAvatarText}>{m.initials}</Text>
+          {loadingTeam ? (
+            <ActivityIndicator color={C.blue} style={{ marginVertical: 24 }} />
+          ) : (
+            <View style={s.teamGrid}>
+              {team.map((m, i) => (
+                <View key={m._id} style={s.teamCard}>
+                  <View style={[s.teamAvatar, { backgroundColor: m.cor || AVATAR_COLORS[i % AVATAR_COLORS.length] }]}>
+                    <Text style={s.teamAvatarText}>{getInitials(m.nome)}</Text>
+                  </View>
+                  <Text style={s.teamNome}>{m.nome}</Text>
+                  <Text style={s.teamCargo}>{m.cargo}</Text>
                 </View>
-                <Text style={s.teamNome}>{m.nome}</Text>
-                <Text style={s.teamCargo}>{m.cargo}</Text>
-              </View>
-            ))}
-          </View>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* CTA */}
@@ -118,8 +144,8 @@ const s = StyleSheet.create({
   ctaSection: { backgroundColor: C.navyDark, padding: 32, alignItems: 'center' },
   ctaTitle: { color: '#fff', fontSize: 24, fontWeight: '800', textAlign: 'center', lineHeight: 31, marginBottom: 12 },
   ctaSubtitle: { color: C.textMuted, fontSize: 13, textAlign: 'center', lineHeight: 20, marginBottom: 20 },
-  btnPrimary: { backgroundColor: C.blue, borderRadius: 8, paddingHorizontal: 24, paddingVertical: 13 },
+  btnPrimary: { backgroundColor: C.blue, borderRadius: 8, paddingHorizontal: 24, paddingVertical: 13, marginBottom: 10 },
   btnPrimaryText: { color: '#fff', fontWeight: '700', fontSize: 14 },
-  btnWhatsapp: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#22c55e', borderRadius: 8, paddingHorizontal: 24, paddingVertical: 13, marginTop: 10 },
+  btnWhatsapp: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#22c55e', borderRadius: 8, paddingHorizontal: 24, paddingVertical: 13 },
   btnWhatsappText: { color: '#fff', fontWeight: '700', fontSize: 14 },
 });

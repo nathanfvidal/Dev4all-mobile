@@ -16,11 +16,12 @@ const projectSchema = new mongoose.Schema(
     categorias: {
       type: [String],
       enum: {
-        values: ['Consultoria', 'Desenvolvimento', 'Design', 'Marketing', 'Outro'],
+        values: ['Consultoria', 'Desenvolvimento', 'Design', 'Marketing', 'Outro', 'Mobile', 'Web', 'Dashboard'],
         message: 'Categoria inválida: {VALUE}',
       },
       default: [],
     },
+    tecnologias: { type: [String], default: [] },
     imagemUrl: { type: String, default: null },
     linkExterno: { type: String, default: null },
 

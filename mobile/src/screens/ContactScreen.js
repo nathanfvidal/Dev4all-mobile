@@ -1,39 +1,63 @@
 import React, { useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  TextInput, KeyboardAvoidingView, Platform,
+  TextInput, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../data/mockData';
+import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import FeedbackModal from '../components/FeedbackModal';
 
 const C = COLORS;
 const CHIPS = ['Consultoria', 'Desenvolvimento', 'Design', 'Marketing', 'Outro'];
 
 export default function ContactScreen({ navigation }) {
+  const { token } = useAuth();
   const [form, setForm] = useState({ nome: '', email: '', telefone: '', descricao: '' });
   const [chips, setChips] = useState([]);
   const [erros, setErros] = useState({});
+  const [loading, setLoading] = useState(false);
   const [enviado, setEnviado] = useState(false);
+  const [codigoRastreio, setCodigoRastreio] = useState('');
+  const [modal, setModal] = useState({ visible: false, message: '' });
 
   function toggleChip(c) {
     setChips((prev) => prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]);
+    setErros((p) => ({ ...p, chips: '' }));
   }
 
   function validar() {
     const e = {};
-    if (!form.nome.trim())        e.nome = 'Nome é obrigatório';
+    if (!form.nome.trim())         e.nome = 'Nome é obrigatório';
     if (!form.email.includes('@')) e.email = 'E-mail inválido';
-    if (!form.telefone.trim())    e.telefone = 'Telefone é obrigatório';
-    if (!form.descricao.trim())   e.descricao = 'Descrição é obrigatória';
+    if (!form.telefone.trim())     e.telefone = 'Telefone é obrigatório';
+    if (!form.descricao.trim())    e.descricao = 'Descrição é obrigatória';
+    if (chips.length === 0)        e.chips = 'Selecione ao menos um tipo de serviço';
     return e;
   }
 
-  function handleEnviar() {
+  async function handleEnviar() {
     const e = validar();
     if (Object.keys(e).length > 0) { setErros(e); return; }
     setErros({});
-    setEnviado(true);
+    setLoading(true);
+    try {
+      const res = await api.createQuote({
+        nomeCompleto: form.nome,
+        email: form.email,
+        telefone: form.telefone,
+        tipoServico: chips,
+        descricao: form.descricao,
+      }, token);
+      setCodigoRastreio(res.codigoRastreio || '');
+      setEnviado(true);
+    } catch (err) {
+      setModal({ visible: true, message: err.message });
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleLimpar() {
@@ -41,6 +65,7 @@ export default function ContactScreen({ navigation }) {
     setChips([]);
     setErros({});
     setEnviado(false);
+    setCodigoRastreio('');
   }
 
   if (enviado) {
@@ -56,6 +81,13 @@ export default function ContactScreen({ navigation }) {
           <Text style={s.successMsg}>
             Obrigado, {form.nome.split(' ')[0]}!{'\n'}Responderemos em até 24 horas no e-mail{'\n'}{form.email}.
           </Text>
+          {codigoRastreio ? (
+            <View style={s.codigoBox}>
+              <Text style={s.codigoLabel}>Código de rastreio</Text>
+              <Text style={s.codigoCodigo}>{codigoRastreio}</Text>
+              <Text style={s.codigoHint}>Guarde este código para acompanhar seu orçamento.</Text>
+            </View>
+          ) : null}
           <TouchableOpacity style={s.btnPrimary} onPress={handleLimpar}>
             <Text style={s.btnPrimaryText}>Enviar novo orçamento</Text>
           </TouchableOpacity>
@@ -66,10 +98,17 @@ export default function ContactScreen({ navigation }) {
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
+      <FeedbackModal
+        visible={modal.visible}
+        type="error"
+        title="Erro ao enviar orçamento"
+        message={modal.message}
+        onClose={() => setModal({ visible: false, message: '' })}
+      />
+
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView showsVerticalScrollIndicator={false}>
 
-          {/* PAGE HERO */}
           <View style={s.pageHero}>
             <Text style={s.pageLabel}>CONTATO</Text>
             <Text style={s.pageTitle}>Formulário de Orçamento</Text>
@@ -80,7 +119,6 @@ export default function ContactScreen({ navigation }) {
             <Text style={s.formTitle}>Solicite seu Orçamento</Text>
             <Text style={s.formSubtitle}>Preencha os campos abaixo e responderemos em até 24 horas</Text>
 
-            {/* Nome */}
             <View style={s.campo}>
               <Text style={s.label}>Nome Completo</Text>
               <TextInput
@@ -88,12 +126,11 @@ export default function ContactScreen({ navigation }) {
                 placeholder="Digite seu nome completo"
                 placeholderTextColor={C.textMuted}
                 value={form.nome}
-                onChangeText={(v) => setForm({ ...form, nome: v })}
+                onChangeText={(v) => { setForm({ ...form, nome: v }); setErros((p) => ({ ...p, nome: '' })); }}
               />
-              {erros.nome && <Text style={s.erroText}>{erros.nome}</Text>}
+              {erros.nome ? <Text style={s.erroText}>{erros.nome}</Text> : null}
             </View>
 
-            {/* Email */}
             <View style={s.campo}>
               <Text style={s.label}>Email</Text>
               <TextInput
@@ -103,12 +140,11 @@ export default function ContactScreen({ navigation }) {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={form.email}
-                onChangeText={(v) => setForm({ ...form, email: v })}
+                onChangeText={(v) => { setForm({ ...form, email: v }); setErros((p) => ({ ...p, email: '' })); }}
               />
-              {erros.email && <Text style={s.erroText}>{erros.email}</Text>}
+              {erros.email ? <Text style={s.erroText}>{erros.email}</Text> : null}
             </View>
 
-            {/* Telefone */}
             <View style={s.campo}>
               <Text style={s.label}>Telefone</Text>
               <TextInput
@@ -117,12 +153,11 @@ export default function ContactScreen({ navigation }) {
                 placeholderTextColor={C.textMuted}
                 keyboardType="phone-pad"
                 value={form.telefone}
-                onChangeText={(v) => setForm({ ...form, telefone: v })}
+                onChangeText={(v) => { setForm({ ...form, telefone: v }); setErros((p) => ({ ...p, telefone: '' })); }}
               />
-              {erros.telefone && <Text style={s.erroText}>{erros.telefone}</Text>}
+              {erros.telefone ? <Text style={s.erroText}>{erros.telefone}</Text> : null}
             </View>
 
-            {/* Tipo de Serviço */}
             <View style={s.campo}>
               <Text style={s.label}>Tipo de Serviço</Text>
               <View style={s.chipsRow}>
@@ -139,9 +174,9 @@ export default function ContactScreen({ navigation }) {
                   );
                 })}
               </View>
+              {erros.chips ? <Text style={s.erroText}>{erros.chips}</Text> : null}
             </View>
 
-            {/* Descrição */}
             <View style={s.campo}>
               <Text style={s.label}>Descrição do Projeto</Text>
               <TextInput
@@ -152,28 +187,26 @@ export default function ContactScreen({ navigation }) {
                 numberOfLines={6}
                 textAlignVertical="top"
                 value={form.descricao}
-                onChangeText={(v) => setForm({ ...form, descricao: v })}
+                onChangeText={(v) => { setForm({ ...form, descricao: v }); setErros((p) => ({ ...p, descricao: '' })); }}
               />
-              {erros.descricao && <Text style={s.erroText}>{erros.descricao}</Text>}
+              {erros.descricao ? <Text style={s.erroText}>{erros.descricao}</Text> : null}
             </View>
 
-            {/* Botões */}
             <View style={s.formActions}>
               <TouchableOpacity style={s.btnOutline} onPress={handleLimpar}>
                 <Text style={s.btnOutlineText}>Limpar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={s.btnPrimary} onPress={handleEnviar}>
-                <Text style={s.btnPrimaryText}>Enviar Orçamento →</Text>
+              <TouchableOpacity style={[s.btnPrimary, loading && s.btnDisabled]} onPress={handleEnviar} disabled={loading}>
+                {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.btnPrimaryText}>Enviar Orçamento →</Text>}
               </TouchableOpacity>
             </View>
             <Text style={s.formNote}>Responderemos em até 24 horas pelo e-mail informado no formulário.</Text>
 
-            {/* Contato info */}
             <View style={s.contactInfoGrid}>
               {[
-                { icon: 'message-circle', bg: '#dcfce7', color: '#22c55e', titulo: 'WhatsApp', sub: '+55 83 9999-9999', note: 'Atendimento rápido' },
-                { icon: 'mail',           bg: '#dbeafe', color: '#2563eb', titulo: 'E-mail',   sub: 'suporte@dev4all.com', note: 'Resposta em 24h' },
-                { icon: 'map-pin',        bg: '#ede9fe', color: '#8b5cf6', titulo: 'Localização', sub: 'Campina Grande, PB', note: 'Brasil' },
+                { icon: 'message-circle', bg: '#dcfce7', color: '#22c55e', titulo: 'WhatsApp',    sub: '+55 83 9999-9999',    note: 'Atendimento rápido' },
+                { icon: 'mail',           bg: '#dbeafe', color: '#2563eb', titulo: 'E-mail',      sub: 'suporte@dev4all.com', note: 'Resposta em 24h' },
+                { icon: 'map-pin',        bg: '#ede9fe', color: '#8b5cf6', titulo: 'Localização', sub: 'Campina Grande, PB',  note: 'Brasil' },
               ].map((item) => (
                 <View key={item.titulo} style={s.contactInfoCard}>
                   <View style={[s.contactInfoIcon, { backgroundColor: item.bg }]}>
@@ -188,7 +221,6 @@ export default function ContactScreen({ navigation }) {
               ))}
             </View>
           </View>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -217,6 +249,7 @@ const s = StyleSheet.create({
   chipTextAtivo: { color: '#fff' },
   formActions: { flexDirection: 'row', gap: 10, marginTop: 8, marginBottom: 10 },
   btnPrimary: { flex: 1, backgroundColor: C.blue, borderRadius: 8, paddingVertical: 13, alignItems: 'center' },
+  btnDisabled: { opacity: 0.6 },
   btnPrimaryText: { color: '#fff', fontWeight: '700', fontSize: 14 },
   btnOutline: { borderWidth: 1.5, borderColor: C.textDark, borderRadius: 8, paddingHorizontal: 16, paddingVertical: 13, alignItems: 'center' },
   btnOutlineText: { color: C.textDark, fontWeight: '700', fontSize: 14 },
@@ -230,5 +263,9 @@ const s = StyleSheet.create({
   successBox: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
   successIcon: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#f0fdf4', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
   successTitle: { fontSize: 26, fontWeight: '800', color: C.textDark, marginBottom: 12 },
-  successMsg: { fontSize: 15, color: C.textMid, textAlign: 'center', lineHeight: 22, marginBottom: 28 },
+  successMsg: { fontSize: 15, color: C.textMid, textAlign: 'center', lineHeight: 22, marginBottom: 20 },
+  codigoBox: { backgroundColor: C.bgLight, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: C.border, alignItems: 'center', marginBottom: 24, width: '100%' },
+  codigoLabel: { fontSize: 12, color: C.textMuted, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 },
+  codigoCodigo: { fontSize: 28, fontWeight: '800', color: C.blue, letterSpacing: 4, marginBottom: 6 },
+  codigoHint: { fontSize: 12, color: C.textMuted, textAlign: 'center' },
 });

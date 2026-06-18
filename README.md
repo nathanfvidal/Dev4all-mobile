@@ -1,13 +1,13 @@
-# Dev4All — Aplicativo Mobile
+# Dev4all — Agência de Desenvolvimento Digital
 
-Aplicativo mobile da agência de desenvolvimento **Dev4All**, desenvolvido em **React Native com Expo**.
+Aplicação full stack mobile desenvolvida como trabalho de faculdade. O projeto consiste em um app mobile em React Native integrado a um backend Node.js com banco de dados MongoDB Atlas.
 
 ---
 
-## 👥 Integrantes da Equipe
+## Integrantes da Equipe
 
-| Nome | Função |
-|------|--------|
+| Nome | Papel |
+|---|---|
 | Felipe Almeida Albino | Product Owner & Dev Full Stack |
 | Reuel Vinicius | Dev Back-end & DBA |
 | Nathan Feitoza | Dev Full Stack & UX Designer |
@@ -15,148 +15,239 @@ Aplicativo mobile da agência de desenvolvimento **Dev4All**, desenvolvido em **
 
 ---
 
-## 📱 Descrição do Aplicativo
+## Descrição da Aplicação
 
-O **Dev4All** é o aplicativo mobile oficial de uma agência de desenvolvimento web e mobile. O app permite que clientes conheçam os serviços, o portfólio de projetos e a equipe da agência, além de poderem solicitar orçamentos diretamente pelo celular.
+O **Dev4all** é o sistema digital da agência de desenvolvimento Dev4all. Permite que clientes conheçam os serviços e portfólio da empresa, solicitem orçamentos, acompanhem o status dos seus pedidos e gerenciem sua conta. Administradores têm controle total sobre projetos e orçamentos via painel web.
 
 **Funcionalidades principais:**
-- Apresentação da agência com estatísticas e projetos em destaque
-- Portfólio completo com filtros por categoria
-- Detalhes de cada projeto com tecnologias utilizadas
-- Página "Sobre nós" com missão, valores e equipe
-- Formulário de orçamento com validação
-- Telas de Login e Cadastro
+- Portfólio de projetos carregado do banco de dados
+- Formulário de orçamento com código de rastreio único
+- Autenticação completa (login / cadastro / perfil)
+- Histórico de orçamentos do usuário logado
+- Equipe carregada do banco de dados
+- Painel web para administração (CRUD completo)
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
-| Tecnologia | Versão | Uso |
-|-----------|--------|-----|
-| React Native | 0.81.5 | Framework mobile |
-| Expo | SDK 54 | Ambiente de desenvolvimento |
-| React Navigation | 7.x | Navegação entre telas |
-| @expo/vector-icons | 15.x | Ícones (Feather) |
-| react-native-safe-area-context | ~5.6.0 | Área segura do dispositivo |
-| react-native-gesture-handler | ~2.28.0 | Gestos e interações |
-| react-native-reanimated | ~4.1.1 | Animações |
+### Mobile
+- React Native + Expo SDK 54
+- React Navigation v7 (Bottom Tabs + Stack Navigator)
+- react-native-reanimated ~4.1.1
+- react-native-safe-area-context
+- Context API (gerenciamento de autenticação)
+- Fetch API nativa (comunicação HTTP com o backend)
 
-> **Fase 1:** dados mockados, sem backend. O backend (Node.js + MongoDB) está na pasta `backend/` para a Fase 2.
+### Backend
+- Node.js + Express 4
+- MongoDB Atlas + Mongoose 9
+- JWT (jsonwebtoken) para autenticação stateless
+- bcryptjs para hash de senhas
+- Apollo Server + GraphQL (endpoint alternativo)
+- Helmet, CORS, express-rate-limit (segurança)
 
----
-
-## ✅ Funcionalidades Implementadas
-
-- [x] **Tela Home** — hero, estatísticas (50+/98%/24/7), brands strip, 4 serviços, 4 etapas "Como funciona", portfólio em destaque, depoimentos de clientes e CTA
-- [x] **Tela Portfólio** — listagem de projetos com filtros por categoria (Desenvolvimento, Design, Mobile, Web...)
-- [x] **Tela Detalhe do Projeto** — imagem, categorias, descrição, tecnologias, informações e botão de orçamento
-- [x] **Tela Sobre Nós** — missão, valores (Inovação, Qualidade, Comprometimento, Excelência), "Por que Dev4all?" e equipe completa
-- [x] **Tela Contato** — formulário de orçamento com chips de serviço, validação de campos e cards de contato (WhatsApp, E-mail, Localização)
-- [x] **Tela Login** — autenticação com tabs Login/Registro e botões sociais
-- [x] **Tela Registro** — cadastro com validação de nome, e-mail e senha
-- [x] **Navegação Bottom Tabs** — Home, Portfólio, Sobre nós, Contato, Login
-- [x] **Navegação Stack** — detalhe de projetos e fluxo de autenticação
+### Website (Frontend Web)
+- HTML5 + CSS3 + JavaScript puro
+- Servido como estático pelo próprio backend Express
 
 ---
 
-## 📂 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 Dev4all-mobile/
-│
-├── mobile/                        ← App React Native (Fase 1)
-│   ├── App.js                     ← Entrada da aplicação
-│   ├── src/
-│   │   ├── navigation/
-│   │   │   └── AppNavigator.js    ← Bottom Tabs + Stack Navigator
-│   │   ├── screens/
-│   │   │   ├── HomeScreen.js      ← Tela inicial
-│   │   │   ├── PortfolioScreen.js ← Lista de projetos com filtros
-│   │   │   ├── ProjectDetailScreen.js ← Detalhe do projeto
-│   │   │   ├── SobreScreen.js     ← Sobre nós / equipe
-│   │   │   ├── ContactScreen.js   ← Formulário de orçamento
-│   │   │   ├── LoginScreen.js     ← Login
-│   │   │   └── RegistroScreen.js  ← Cadastro
-│   │   └── data/
-│   │       └── mockData.js        ← Dados mockados (projetos, equipe, serviços)
-│   └── package.json
-│
-└── backend/                       ← API Node.js + MongoDB (Fase 2)
-    ├── src/
-    │   ├── controllers/
-    │   ├── models/
-    │   ├── routes/
-    │   ├── graphql/
-    │   ├── middlewares/
-    │   └── server.js
-    ├── public/                    ← Frontend web estático
-    └── package.json
+├── backend/
+│   ├── public/             # Website estático (HTML/CSS/JS)
+│   │   ├── css/
+│   │   ├── js/
+│   │   ├── index.html
+│   │   ├── portfolio.html
+│   │   ├── sobre.html
+│   │   ├── contato.html
+│   │   └── painel.html
+│   └── src/
+│       ├── app.js          # Configuração do Express
+│       ├── server.js       # Ponto de entrada
+│       ├── config/         # Conexão DB e JWT
+│       ├── controllers/    # Lógica de negócio (auth, projects, quotes, team)
+│       ├── middlewares/    # Auth, validação, tratamento de erros
+│       ├── models/         # Schemas Mongoose (User, Project, Quote, TeamMember)
+│       ├── routes/         # Rotas da API REST
+│       ├── graphql/        # Schema e resolvers GraphQL
+│       ├── scripts/        # seed.js, create-admin.js
+│       └── validators/     # Schemas Joi para validação
+└── mobile/
+    ├── App.js
+    └── src/
+        ├── context/        # AuthContext (estado global de autenticação)
+        ├── data/           # mockData.js (cores e constantes de UI estáticas)
+        ├── navigation/     # AppNavigator (Tab + Stack)
+        ├── screens/        # HomeScreen, PortfolioScreen, SobreScreen,
+        │                   # ContactScreen, LoginScreen, RegistroScreen,
+        │                   # ProfileScreen, ProjectDetailScreen
+        └── services/       # api.js (toda a comunicação HTTP com o backend)
 ```
 
 ---
 
-## 🚀 Como Executar o App (Fase 1)
+## Endpoints da API
+
+### Auth — `/api/auth`
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| POST | `/auth/register` | Público | Criar conta |
+| POST | `/auth/login` | Público | Fazer login |
+| GET | `/auth/me` | Autenticado | Dados do usuário logado |
+
+### Projetos — `/api/projects`
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/projects` | Público | Listar projetos ativos |
+| GET | `/projects/:id` | Público | Buscar projeto por ID |
+| POST | `/projects` | Admin | Criar projeto |
+| PATCH | `/projects/:id` | Admin | Atualizar projeto |
+| DELETE | `/projects/:id` | Admin | Desativar projeto (soft delete) |
+
+### Orçamentos — `/api/quotes`
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| POST | `/quotes` | Público | Enviar orçamento |
+| GET | `/quotes/track/:codigo` | Público | Rastrear por código de 6 dígitos |
+| GET | `/quotes/my` | Autenticado | Meus orçamentos |
+| GET | `/quotes` | Admin | Listar todos os orçamentos |
+| GET | `/quotes/:id` | Autenticado | Buscar orçamento por ID |
+| PATCH | `/quotes/:id/status` | Admin | Atualizar status do orçamento |
+| DELETE | `/quotes/:id` | Admin | Remover orçamento |
+
+### Equipe — `/api/team`
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/team` | Público | Listar membros da equipe |
+| POST | `/team` | Admin | Adicionar membro |
+| PATCH | `/team/:id` | Admin | Atualizar membro |
+| DELETE | `/team/:id` | Admin | Remover membro |
+
+---
+
+## Modelagem do Banco de Dados
+
+### User
+```
+nomeCompleto  String       obrigatório
+email         String       único, obrigatório
+senha         String       hash bcrypt, obrigatório
+role          String       'cliente' | 'admin'  (default: 'cliente')
+ativo         Boolean      default: true
+```
+
+### Project
+```
+titulo        String       obrigatório
+descricao     String       obrigatório
+categorias    [String]     enum: Desenvolvimento | Design | Mobile | Web | Dashboard | Consultoria | Marketing | Outro
+tecnologias   [String]     lista de stacks utilizadas
+imagemUrl     String       URL da imagem de capa
+destaque      Boolean      default: false
+ativo         Boolean      default: true  (soft delete)
+criadoPor     ObjectId     ref → User
+```
+
+### Quote (Orçamento)
+```
+nomeCompleto    String     obrigatório
+email           String     obrigatório
+telefone        String     obrigatório
+tipoServico     [String]   enum: Consultoria | Desenvolvimento | Design | Marketing | Outro (mín. 1)
+descricao       String     obrigatório
+status          String     pendente | em_analise | aprovado | rejeitado
+codigoRastreio  String     6 dígitos, gerado automaticamente, único
+usuario         ObjectId   ref → User (opcional)
+```
+
+### TeamMember
+```
+nome      String    obrigatório
+cargo     String    obrigatório
+bio       String
+cor       String    hex da cor do avatar
+ordem     Number    para ordenação
+ativo     Boolean
+```
+
+---
+
+## Instruções para Execução
 
 ### Pré-requisitos
+- Node.js >= 18
+- Expo Go instalado no celular (disponível na App Store / Play Store)
 
-- [Node.js](https://nodejs.org/) v18 ou superior
-- [NPM](https://www.npmjs.com/)
-- App **Expo Go** instalado no celular:
-  - [Android — Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)
-  - [iOS — App Store](https://apps.apple.com/app/expo-go/id982107779)
-
-### Passo a passo
-
-```bash
-# 1. Clone o repositório
-git clone https://github.com/seu-usuario/Dev4all-mobile.git
-cd Dev4all-mobile
-
-# 2. Entre na pasta do app mobile
-cd mobile
-
-# 3. Instale as dependências
-npm install
-
-# 4. Inicie o servidor Expo
-npx expo start
-```
-
-**Após iniciar:** escaneie o **QR Code** exibido no terminal com o app **Expo Go** no celular.
-
-> O app também pode ser executado no navegador com `npx expo start --web`
-
----
-
-## 🖥️ Telas do Aplicativo
-
-| Tela | Rota / Aba | Descrição |
-|------|-----------|-----------|
-| Home | Aba Home | Apresentação completa da agência |
-| Portfólio | Aba Portfólio | Lista de projetos com filtros |
-| Detalhe | (Stack) | Informações detalhadas do projeto |
-| Sobre Nós | Aba Sobre nós | Missão, valores e equipe |
-| Contato | Aba Contato | Formulário de orçamento |
-| Login | Aba Login | Autenticação de usuário |
-| Registro | (Stack) | Cadastro de novo usuário |
-
----
-
-## 🔗 Backend — Fase 2
-
-O backend já está implementado na pasta `backend/` e será integrado ao app na próxima fase.
+### 1. Backend
 
 ```bash
 cd backend
 npm install
-npm run seed   # popula o banco com dados de exemplo
-npm run dev    # inicia em http://localhost:3000
+
+# Popula o banco com projetos, equipe e orçamentos de exemplo
+npm run seed
+
+# Inicia o servidor em modo desenvolvimento (porta 3000)
+npm run dev
 ```
 
-Credenciais admin padrão (após seed):
-- **E-mail:** `admin@dev4all.com`
-- **Senha:** `admin`
+O website estará disponível em: `http://localhost:3000`
+
+**Credenciais admin padrão (após rodar o seed):**
+```
+Email: admin@dev4all.com
+Senha: admin
+```
+
+### 2. App Mobile
+
+```bash
+cd mobile
+npm install
+```
+
+Edite [`src/services/api.js`](mobile/src/services/api.js) e substitua o IP pelo endereço local da máquina que roda o backend:
+
+```js
+// Antes
+const BASE_URL = 'http://192.168.0.10:3000/api';
+
+// Depois (exemplo)
+const BASE_URL = 'http://SEU_IP_LOCAL:3000/api';
+```
+
+Para descobrir seu IP: execute `ipconfig` (Windows) ou `ifconfig` (Mac/Linux) e use o **Endereço IPv4** da rede Wi-Fi.
+
+```bash
+npx expo start
+```
+
+Escaneie o QR Code com o **Expo Go**. O celular e o computador devem estar na **mesma rede Wi-Fi**.
+
+### 3. Website
+
+Após iniciar o backend, acesse `http://localhost:3000` no navegador.
 
 ---
 
-**Desenvolvido pela equipe Dev4All — Turma de Desenvolvimento Mobile.**
+## Checklist de Requisitos
+
+- [x] App mobile em React Native integrado ao backend
+- [x] Backend em Node.js com Express
+- [x] Banco de dados MongoDB Atlas
+- [x] Persistência de dados real (sem mock para entidades principais)
+- [x] CRUD completo de Orçamentos (criar, listar, buscar, atualizar status, deletar)
+- [x] CRUD completo de Projetos (via painel web admin)
+- [x] Comunicação HTTP entre app e API (Fetch API)
+- [x] Tratamento de erros (loading states, mensagens de erro, validação)
+- [x] Autenticação com JWT
+- [x] README com todas as seções obrigatórias

@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-const CATEGORIAS = ['Consultoria', 'Desenvolvimento', 'Design', 'Marketing', 'Outro'];
+const CATEGORIAS = ['Consultoria', 'Desenvolvimento', 'Design', 'Marketing', 'Outro', 'Mobile', 'Web', 'Dashboard'];
 
 export const createProjectSchema = Joi.object({
   titulo: Joi.string().trim().max(200).required()

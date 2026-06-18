@@ -1,14 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, projects } from '../data/mockData';
+import { COLORS } from '../data/mockData';
+import { api } from '../services/api';
+import FeedbackModal from '../components/FeedbackModal';
 
 const C = COLORS;
 const CATS = ['Todos', 'Desenvolvimento', 'Design', 'Mobile', 'Web', 'Dashboard'];
 
 export default function PortfolioScreen({ navigation }) {
   const [catAtiva, setCatAtiva] = useState('Todos');
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState({ visible: false, message: '' });
+
+  useEffect(() => {
+    api.getProjects()
+      .then((res) => setProjects(res.data))
+      .catch((e) => setModal({ visible: true, message: e.message }))
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtrados = projects.filter(
     (p) => catAtiva === 'Todos' || p.categorias.includes(catAtiva)
@@ -16,14 +28,20 @@ export default function PortfolioScreen({ navigation }) {
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
-      {/* PAGE HERO */}
+      <FeedbackModal
+        visible={modal.visible}
+        type="error"
+        title="Erro ao carregar projetos"
+        message={modal.message}
+        onClose={() => setModal({ visible: false, message: '' })}
+      />
+
       <View style={s.pageHero}>
         <Text style={s.pageLabel}>NOSSO PORTFÓLIO</Text>
         <Text style={s.pageTitle}>Projetos que entregam resultados reais</Text>
-        <Text style={s.pageSubtitle}>Confira algumas aplicações web que já criamos para nossos clientes.</Text>
+        <Text style={s.pageSubtitle}>Confira algumas aplicações que já criamos para nossos clientes.</Text>
       </View>
 
-      {/* FILTROS */}
       <View style={s.filtersWrapper}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.filtersContent}>
           {CATS.map((cat) => (
@@ -38,16 +56,35 @@ export default function PortfolioScreen({ navigation }) {
         </ScrollView>
       </View>
 
-      {/* LISTA */}
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.lista}>
-        {filtrados.map((proj) => (
+        {loading && (
+          <View style={s.centerBox}>
+            <ActivityIndicator size="large" color={C.blue} />
+            <Text style={s.loadingText}>Carregando projetos...</Text>
+          </View>
+        )}
+
+        {!loading && filtrados.length === 0 && (
+          <View style={s.centerBox}>
+            <Feather name="folder" size={36} color={C.textMuted} />
+            <Text style={s.emptyText}>Nenhum projeto nesta categoria.</Text>
+          </View>
+        )}
+
+        {!loading && filtrados.map((proj) => (
           <TouchableOpacity
-            key={proj.id}
+            key={proj._id}
             style={s.card}
-            onPress={() => navigation.navigate('ProjectDetail', { project: proj })}
+            onPress={() => navigation.navigate('ProjectDetail', { project: { ...proj, id: proj._id } })}
             activeOpacity={0.85}
           >
-            <Image source={{ uri: proj.imagemUrl }} style={s.cardImg} />
+            {proj.imagemUrl ? (
+              <Image source={{ uri: proj.imagemUrl }} style={s.cardImg} />
+            ) : (
+              <View style={[s.cardImg, s.cardImgPlaceholder]}>
+                <Feather name="image" size={32} color={C.textMuted} />
+              </View>
+            )}
             {proj.destaque && (
               <View style={s.destaqueBadge}>
                 <Feather name="star" size={10} color="#fff" />
@@ -62,11 +99,13 @@ export default function PortfolioScreen({ navigation }) {
               </View>
               <Text style={s.cardTitle}>{proj.titulo}</Text>
               <Text style={s.cardDesc} numberOfLines={2}>{proj.descricao}</Text>
-              <View style={s.techs}>
-                {proj.tecnologias.map((t) => (
-                  <Text key={t} style={s.techTag}>{t}</Text>
-                ))}
-              </View>
+              {proj.tecnologias?.length > 0 && (
+                <View style={s.techs}>
+                  {proj.tecnologias.map((t) => (
+                    <Text key={t} style={s.techTag}>{t}</Text>
+                  ))}
+                </View>
+              )}
               <View style={s.cardFooter}>
                 <Text style={s.verMais}>Ver detalhes</Text>
                 <Feather name="arrow-right" size={14} color={C.blue} />
@@ -75,14 +114,15 @@ export default function PortfolioScreen({ navigation }) {
           </TouchableOpacity>
         ))}
 
-        {/* CTA */}
-        <View style={s.ctaSection}>
-          <Text style={s.ctaTitle}>Pronto para transformar{'\n'}seu negócio digital?</Text>
-          <Text style={s.ctaSubtitle}>Fale com nossa equipe hoje e receba um orçamento gratuito em menos de 24 horas.</Text>
-          <TouchableOpacity style={s.btnPrimary} onPress={() => navigation.navigate('Contato')}>
-            <Text style={s.btnPrimaryText}>Solicite seu projeto grátis</Text>
-          </TouchableOpacity>
-        </View>
+        {!loading && (
+          <View style={s.ctaSection}>
+            <Text style={s.ctaTitle}>Pronto para transformar{'\n'}seu negócio digital?</Text>
+            <Text style={s.ctaSubtitle}>Fale com nossa equipe hoje e receba um orçamento gratuito em menos de 24 horas.</Text>
+            <TouchableOpacity style={s.btnPrimary} onPress={() => navigation.navigate('Contato')}>
+              <Text style={s.btnPrimaryText}>Solicite seu projeto grátis</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -101,8 +141,12 @@ const s = StyleSheet.create({
   filterText: { fontSize: 13, color: C.textMid, fontWeight: '600' },
   filterTextActive: { color: '#fff' },
   lista: { padding: 16, gap: 16 },
+  centerBox: { alignItems: 'center', paddingVertical: 48, gap: 12 },
+  loadingText: { color: C.textMuted, fontSize: 14 },
+  emptyText: { color: C.textMid, fontSize: 15, fontWeight: '600', textAlign: 'center' },
   card: { backgroundColor: C.white, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: C.border, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 8, elevation: 3 },
   cardImg: { width: '100%', height: 200 },
+  cardImgPlaceholder: { backgroundColor: C.bgLight, justifyContent: 'center', alignItems: 'center' },
   destaqueBadge: { position: 'absolute', top: 12, right: 12, backgroundColor: C.blue, flexDirection: 'row', alignItems: 'center', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, gap: 4 },
   destaqueText: { color: '#fff', fontSize: 11, fontWeight: '700' },
   cardBody: { padding: 16 },

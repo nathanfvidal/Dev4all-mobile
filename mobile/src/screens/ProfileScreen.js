@@ -1,26 +1,41 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 import { COLORS } from '../data/mockData';
 
 const C = COLORS;
 
-export default function ProfileScreen({ navigation }) {
-  const { user, logout } = useAuth();
+const STATUS_LABEL = {
+  pendente:   { label: 'Pendente',    bg: '#fef9c3', color: '#ca8a04' },
+  em_analise: { label: 'Em análise',  bg: '#dbeafe', color: '#2563eb' },
+  aprovado:   { label: 'Aprovado',    bg: '#dcfce7', color: '#16a34a' },
+  rejeitado:  { label: 'Rejeitado',   bg: '#fef2f2', color: '#dc2626' },
+};
 
-  const initials = user?.nome
-    ? user.nome.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
+export default function ProfileScreen({ navigation }) {
+  const { user, token, logout } = useAuth();
+  const [quotes, setQuotes] = useState([]);
+  const [loadingQuotes, setLoadingQuotes] = useState(true);
+  const [showQuotes, setShowQuotes] = useState(false);
+
+  const initials = user?.nomeCompleto
+    ? user.nomeCompleto.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
     : 'AD';
 
-  const menuItems = [
-    { icon: 'file-text', label: 'Meus Orçamentos', onPress: () => {} },
-    { icon: 'bell',      label: 'Notificações',    onPress: () => {} },
-    { icon: 'settings',  label: 'Configurações',   onPress: () => {} },
-    { icon: 'help-circle', label: 'Suporte',       onPress: () => {} },
-  ];
+  const nomeExibido = user?.nomeCompleto || user?.nome || 'Usuário';
+
+  useEffect(() => {
+    if (token) {
+      api.getMyQuotes(token)
+        .then((res) => setQuotes(res.data))
+        .catch(() => setQuotes([]))
+        .finally(() => setLoadingQuotes(false));
+    }
+  }, [token]);
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
@@ -30,7 +45,7 @@ export default function ProfileScreen({ navigation }) {
           <View style={s.avatar}>
             <Text style={s.avatarText}>{initials}</Text>
           </View>
-          <Text style={s.name}>{user?.nome || 'Admin'}</Text>
+          <Text style={s.name}>{nomeExibido}</Text>
           <Text style={s.email}>{user?.email || ''}</Text>
           <View style={s.badge}>
             <Feather name="shield" size={11} color="#2563eb" />
@@ -39,11 +54,57 @@ export default function ProfileScreen({ navigation }) {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.duration(450).delay(120)} style={s.card}>
-          {menuItems.map((item, i) => (
+          {/* Meus Orçamentos */}
+          <TouchableOpacity
+            style={[s.menuItem, s.menuItemBorder]}
+            onPress={() => setShowQuotes((v) => !v)}
+            activeOpacity={0.7}
+          >
+            <View style={s.menuIcon}>
+              <Feather name="file-text" size={18} color={C.blue} />
+            </View>
+            <Text style={s.menuLabel}>Meus Orçamentos</Text>
+            {!loadingQuotes && <Text style={s.menuBadge}>{quotes.length}</Text>}
+            <Feather name={showQuotes ? 'chevron-up' : 'chevron-down'} size={16} color={C.textMuted} />
+          </TouchableOpacity>
+
+          {showQuotes && (
+            <View style={s.quotesContainer}>
+              {loadingQuotes ? (
+                <ActivityIndicator color={C.blue} style={{ padding: 16 }} />
+              ) : quotes.length === 0 ? (
+                <Text style={s.quotesEmpty}>Nenhum orçamento enviado ainda.</Text>
+              ) : (
+                quotes.map((q) => {
+                  const st = STATUS_LABEL[q.status] || STATUS_LABEL.pendente;
+                  return (
+                    <View key={q._id} style={s.quoteCard}>
+                      <View style={s.quoteHeader}>
+                        <Text style={s.quoteDesc} numberOfLines={1}>{q.descricao}</Text>
+                        <View style={[s.statusBadge, { backgroundColor: st.bg }]}>
+                          <Text style={[s.statusText, { color: st.color }]}>{st.label}</Text>
+                        </View>
+                      </View>
+                      <Text style={s.quoteServicos}>{q.tipoServico?.join(', ')}</Text>
+                      {q.codigoRastreio && (
+                        <Text style={s.quoteCodigo}>Cód: {q.codigoRastreio}</Text>
+                      )}
+                      <Text style={s.quoteData}>{new Date(q.createdAt).toLocaleDateString('pt-BR')}</Text>
+                    </View>
+                  );
+                })
+              )}
+            </View>
+          )}
+
+          {[
+            { icon: 'bell',        label: 'Notificações' },
+            { icon: 'settings',    label: 'Configurações' },
+            { icon: 'help-circle', label: 'Suporte' },
+          ].map((item, i, arr) => (
             <TouchableOpacity
               key={item.label}
-              style={[s.menuItem, i < menuItems.length - 1 && s.menuItemBorder]}
-              onPress={item.onPress}
+              style={[s.menuItem, i < arr.length - 1 && s.menuItemBorder]}
               activeOpacity={0.7}
             >
               <View style={s.menuIcon}>
@@ -56,11 +117,7 @@ export default function ProfileScreen({ navigation }) {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.duration(450).delay(220)}>
-          <TouchableOpacity
-            style={s.logoutBtn}
-            onPress={logout}
-            activeOpacity={0.8}
-          >
+          <TouchableOpacity style={s.logoutBtn} onPress={logout} activeOpacity={0.8}>
             <Feather name="log-out" size={16} color="#ef4444" />
             <Text style={s.logoutText}>Sair da conta</Text>
           </TouchableOpacity>
@@ -73,82 +130,29 @@ export default function ProfileScreen({ navigation }) {
 
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.navyDark },
-
-  header: {
-    backgroundColor: C.navyDark,
-    alignItems: 'center',
-    paddingTop: 32,
-    paddingBottom: 40,
-    paddingHorizontal: 24,
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: C.blue,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 14,
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,255,0.2)',
-  },
+  header: { backgroundColor: C.navyDark, alignItems: 'center', paddingTop: 32, paddingBottom: 40, paddingHorizontal: 24 },
+  avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: C.blue, justifyContent: 'center', alignItems: 'center', marginBottom: 14, borderWidth: 3, borderColor: 'rgba(255,255,255,0.2)' },
   avatarText: { color: '#fff', fontSize: 28, fontWeight: '800' },
   name: { color: '#fff', fontSize: 20, fontWeight: '800', marginBottom: 4 },
   email: { color: C.textMuted, fontSize: 13, marginBottom: 12 },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(37,99,235,0.15)',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-  },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(37,99,235,0.15)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5 },
   badgeText: { color: '#2563eb', fontSize: 12, fontWeight: '700' },
-
-  card: {
-    backgroundColor: C.white,
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginTop: -20,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-  },
+  card: { backgroundColor: C.white, borderRadius: 16, marginHorizontal: 16, marginTop: -20, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 4 },
+  menuItem: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 16, paddingHorizontal: 18 },
   menuItemBorder: { borderBottomWidth: 1, borderBottomColor: C.border },
-  menuIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: 'rgba(37,99,235,0.08)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  menuIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(37,99,235,0.08)', justifyContent: 'center', alignItems: 'center' },
   menuLabel: { flex: 1, fontSize: 15, fontWeight: '600', color: C.textDark },
-
-  logoutBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 32,
-    paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: '#fef2f2',
-    borderWidth: 1,
-    borderColor: '#fecaca',
-  },
+  menuBadge: { backgroundColor: C.blue, color: '#fff', fontSize: 11, fontWeight: '700', borderRadius: 10, paddingHorizontal: 7, paddingVertical: 2, marginRight: 4, overflow: 'hidden' },
+  quotesContainer: { backgroundColor: C.bgLight, borderBottomWidth: 1, borderBottomColor: C.border },
+  quotesEmpty: { color: C.textMuted, fontSize: 13, textAlign: 'center', padding: 16 },
+  quoteCard: { padding: 14, borderBottomWidth: 1, borderBottomColor: C.border, gap: 4 },
+  quoteHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  quoteDesc: { flex: 1, fontSize: 13, fontWeight: '600', color: C.textDark },
+  statusBadge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
+  statusText: { fontSize: 11, fontWeight: '700' },
+  quoteServicos: { fontSize: 12, color: C.blue, fontWeight: '600' },
+  quoteCodigo: { fontSize: 11, color: C.textMuted },
+  quoteData: { fontSize: 11, color: C.textMuted },
+  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginHorizontal: 16, marginTop: 16, marginBottom: 32, paddingVertical: 14, borderRadius: 12, backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' },
   logoutText: { color: '#ef4444', fontWeight: '700', fontSize: 15 },
 });

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 import { COLORS } from '../data/mockData';
+import FeedbackModal from '../components/FeedbackModal';
 
 const C = COLORS;
 
@@ -11,34 +13,48 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showSenha, setShowSenha] = useState(false);
-  const [erro, setErro] = useState('');
+  const [erros, setErros] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [modal, setModal] = useState({ visible: false, message: '' });
   const { login } = useAuth();
 
-  function handleLogin() {
-    if (!email.trim() || !email.includes('@')) {
-      setErro('Digite um e-mail válido.');
-      return;
+  function validar() {
+    const e = {};
+    if (!email.trim() || !email.includes('@')) e.email = 'Digite um e-mail válido.';
+    if (senha.length < 3) e.senha = 'Senha muito curta.';
+    return e;
+  }
+
+  async function handleLogin() {
+    const e = validar();
+    if (Object.keys(e).length > 0) { setErros(e); return; }
+    setErros({});
+    setLoading(true);
+    try {
+      const res = await api.login(email, senha);
+      login(res.data.user, res.data.token);
+    } catch (err) {
+      setModal({ visible: true, message: err.message });
+    } finally {
+      setLoading(false);
     }
-    if (senha.length < 3) {
-      setErro('Senha muito curta.');
-      return;
-    }
-    setErro('');
-    const nome = email.includes('admin') ? 'Nathan Feitoza (Admin)' : email.split('@')[0];
-    const role = email.includes('admin') ? 'admin' : 'cliente';
-    login({ nome, email, role });
   }
 
   return (
     <SafeAreaView style={s.safe}>
+      <FeedbackModal
+        visible={modal.visible}
+        type="error"
+        title="Falha no login"
+        message={modal.message}
+        onClose={() => setModal({ visible: false, message: '' })}
+      />
+
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
-
-          {/* Circles decoration */}
           <View style={s.circle1} />
           <View style={s.circle2} />
 
-          {/* Logo */}
           <TouchableOpacity onPress={() => navigation.navigate('Home')} style={s.logoWrap}>
             <Text style={s.logo}>Dev4all</Text>
           </TouchableOpacity>
@@ -47,7 +63,6 @@ export default function LoginScreen({ navigation }) {
             <Text style={s.cardTitle}>Bem-vindo de volta</Text>
             <Text style={s.cardSubtitle}>Entre na sua conta Dev4all</Text>
 
-            {/* Tab switcher */}
             <View style={s.tabs}>
               <View style={[s.tabBtn, s.tabBtnActive]}>
                 <Text style={[s.tabText, s.tabTextActive]}>Login</Text>
@@ -57,60 +72,46 @@ export default function LoginScreen({ navigation }) {
               </TouchableOpacity>
             </View>
 
-            {erro ? <Text style={s.errorMsg}>{erro}</Text> : null}
-
             <View style={s.campo}>
               <Text style={s.label}>E-mail</Text>
               <TextInput
-                style={s.input}
+                style={[s.input, erros.email && s.inputErro]}
                 placeholder="seu@email.com"
                 placeholderTextColor={C.textMuted}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(v) => { setEmail(v); setErros((p) => ({ ...p, email: '' })); }}
               />
+              {erros.email ? <Text style={s.erroText}>{erros.email}</Text> : null}
             </View>
 
             <View style={s.campo}>
-              <View style={s.labelRow}>
-                <Text style={s.label}>Senha</Text>
-                <TouchableOpacity><Text style={s.link}>Esqueceu a senha?</Text></TouchableOpacity>
-              </View>
+              <Text style={s.label}>Senha</Text>
               <View style={s.passwordRow}>
                 <TextInput
-                  style={[s.input, { flex: 1 }]}
+                  style={[s.input, { flex: 1 }, erros.senha && s.inputErro]}
                   placeholder="••••••••"
                   placeholderTextColor={C.textMuted}
                   secureTextEntry={!showSenha}
                   value={senha}
-                  onChangeText={setSenha}
+                  onChangeText={(v) => { setSenha(v); setErros((p) => ({ ...p, senha: '' })); }}
                 />
                 <TouchableOpacity style={s.eyeBtn} onPress={() => setShowSenha((v) => !v)}>
                   <Feather name={showSenha ? 'eye-off' : 'eye'} size={18} color={C.textMuted} />
                 </TouchableOpacity>
               </View>
+              {erros.senha ? <Text style={s.erroText}>{erros.senha}</Text> : null}
             </View>
 
-            <TouchableOpacity style={s.btnPrimary} onPress={handleLogin}>
-              <Text style={s.btnPrimaryText}>Entrar →</Text>
+            <TouchableOpacity style={[s.btnPrimary, loading && s.btnDisabled]} onPress={handleLogin} disabled={loading}>
+              {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.btnPrimaryText}>Entrar →</Text>}
             </TouchableOpacity>
 
             <View style={s.dividerRow}>
               <View style={s.dividerLine} />
               <Text style={s.dividerText}>ou</Text>
               <View style={s.dividerLine} />
-            </View>
-
-            <View style={s.socialRow}>
-              <TouchableOpacity style={s.socialBtn}>
-                <Feather name="globe" size={16} color={C.textMid} />
-                <Text style={s.socialBtnText}>Google</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={s.socialBtn}>
-                <Feather name="github" size={16} color={C.textMid} />
-                <Text style={s.socialBtnText}>GitHub</Text>
-              </TouchableOpacity>
             </View>
 
             <Text style={s.footerText}>
@@ -141,22 +142,20 @@ const s = StyleSheet.create({
   tabBtnActive: { backgroundColor: C.white, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
   tabText: { fontSize: 14, fontWeight: '600', color: C.textMuted },
   tabTextActive: { color: C.textDark },
-  errorMsg: { backgroundColor: '#fef2f2', color: '#ef4444', fontSize: 13, padding: 10, borderRadius: 8, marginBottom: 12, textAlign: 'center' },
   campo: { marginBottom: 16 },
-  labelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  label: { fontSize: 13, fontWeight: '600', color: C.textDark },
+  label: { fontSize: 13, fontWeight: '600', color: C.textDark, marginBottom: 6 },
   link: { fontSize: 13, color: C.blue, fontWeight: '600' },
   input: { backgroundColor: C.bgLight, borderRadius: 8, borderWidth: 1.5, borderColor: C.border, paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: C.textDark },
+  inputErro: { borderColor: '#ef4444' },
+  erroText: { color: '#ef4444', fontSize: 12, marginTop: 4 },
   passwordRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   eyeBtn: { padding: 4 },
-  btnPrimary: { backgroundColor: C.blue, borderRadius: 8, paddingVertical: 14, alignItems: 'center', marginTop: 4 },
+  btnPrimary: { backgroundColor: C.blue, borderRadius: 8, paddingVertical: 14, alignItems: 'center', marginTop: 4, marginBottom: 16 },
+  btnDisabled: { opacity: 0.6 },
   btnPrimaryText: { color: '#fff', fontWeight: '700', fontSize: 15 },
-  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 16 },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
   dividerLine: { flex: 1, height: 1, backgroundColor: C.border },
   dividerText: { color: C.textMuted, fontSize: 13 },
-  socialRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
-  socialBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 8, borderWidth: 1.5, borderColor: C.border, paddingVertical: 11, backgroundColor: C.bgLight },
-  socialBtnText: { fontSize: 14, fontWeight: '600', color: C.textMid },
   footerText: { fontSize: 13, color: C.textMuted, textAlign: 'center' },
   copyright: { color: C.textMuted, fontSize: 11, textAlign: 'center', marginTop: 20 },
 });
