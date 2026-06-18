@@ -185,7 +185,10 @@ ativo     Boolean
 
 ### Pré-requisitos
 - Node.js >= 18
-- Expo Go instalado no celular (disponível na App Store / Play Store)
+- **Expo Go SDK 54** instalado no celular
+  - Android: [Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
+  - iOS: [App Store](https://apps.apple.com/app/expo-go/id982107779)
+  - > ⚠️ Este projeto utiliza **Expo SDK 54**. O Expo Go deve estar na versão compatível com SDK 54. Caso o app não abra, atualize o Expo Go pela loja de aplicativos do seu dispositivo.
 
 ### 1. Backend
 
