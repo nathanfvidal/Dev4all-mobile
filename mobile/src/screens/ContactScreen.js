@@ -3,6 +3,7 @@ import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
   TextInput, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../data/mockData';
@@ -22,6 +23,7 @@ export default function ContactScreen({ navigation }) {
   const [enviado, setEnviado] = useState(false);
   const [codigoRastreio, setCodigoRastreio] = useState('');
   const [modal, setModal] = useState({ visible: false, message: '' });
+  const [copiado, setCopiado] = useState(false);
 
   function toggleChip(c) {
     setChips((prev) => prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]);
@@ -60,6 +62,12 @@ export default function ContactScreen({ navigation }) {
     }
   }
 
+  async function handleCopiar() {
+    await Clipboard.setStringAsync(codigoRastreio);
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2500);
+  }
+
   function handleLimpar() {
     setForm({ nome: '', email: '', telefone: '', descricao: '' });
     setChips([]);
@@ -85,6 +93,12 @@ export default function ContactScreen({ navigation }) {
             <View style={s.codigoBox}>
               <Text style={s.codigoLabel}>Código de rastreio</Text>
               <Text style={s.codigoCodigo}>{codigoRastreio}</Text>
+              <TouchableOpacity style={[s.btnCopiar, copiado && s.btnCopiadoAtivo]} onPress={handleCopiar}>
+                <Feather name={copiado ? 'check' : 'copy'} size={14} color={copiado ? '#fff' : C.blue} />
+                <Text style={[s.btnCopiarText, copiado && s.btnCopiarTextAtivo]}>
+                  {copiado ? 'Copiado!' : 'Copiar código'}
+                </Text>
+              </TouchableOpacity>
               <Text style={s.codigoHint}>Guarde este código para acompanhar seu orçamento.</Text>
             </View>
           ) : null}
@@ -268,4 +282,8 @@ const s = StyleSheet.create({
   codigoLabel: { fontSize: 12, color: C.textMuted, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 },
   codigoCodigo: { fontSize: 28, fontWeight: '800', color: C.blue, letterSpacing: 4, marginBottom: 6 },
   codigoHint: { fontSize: 12, color: C.textMuted, textAlign: 'center' },
+  btnCopiar: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1.5, borderColor: C.blue, borderRadius: 8, paddingHorizontal: 16, paddingVertical: 8, marginVertical: 10 },
+  btnCopiadoAtivo: { backgroundColor: '#22c55e', borderColor: '#22c55e' },
+  btnCopiarText: { fontSize: 13, fontWeight: '700', color: C.blue },
+  btnCopiarTextAtivo: { color: '#fff' },
 });

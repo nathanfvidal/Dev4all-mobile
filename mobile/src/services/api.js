@@ -1,5 +1,5 @@
 // Altere para o IP local da sua máquina ao rodar com Expo Go em dispositivo físico
-const BASE_URL = 'http://192.168.0.10:3000/api';
+const BASE_URL = 'http://10.5.3.161:3000/api';
 const TIMEOUT_MS = 10000;
 
 async function request(method, endpoint, body = null, token = null) {

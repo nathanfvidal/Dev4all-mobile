@@ -221,10 +221,6 @@ npm install
 Edite [`src/services/api.js`](mobile/src/services/api.js) e substitua o IP pelo endereço local da máquina que roda o backend:
 
 ```js
-// Antes
-const BASE_URL = 'http://192.168.0.10:3000/api';
-
-// Depois (exemplo)
 const BASE_URL = 'http://SEU_IP_LOCAL:3000/api';
 ```
 
